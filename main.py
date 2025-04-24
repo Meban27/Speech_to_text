@@ -7,9 +7,9 @@ import os
 from pydub import AudioSegment
 
 
-# Point to bundled ffmpeg binary (if on Streamlit Cloud)
-ffmpeg_path = os.path.join(os.path.dirname(__file__), "ffmpeg", "ffmpeg")
-AudioSegment.converter = ffmpeg_path
+# # Point to bundled ffmpeg binary (if on Streamlit Cloud)
+# ffmpeg_path = os.path.join(os.path.dirname(__file__), "ffmpeg", "ffmpeg")
+# AudioSegment.converter = ffmpeg_path
 
 def convert_to_wav(input_path):
     audio = AudioSegment.from_file(input_path)
