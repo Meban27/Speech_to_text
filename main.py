@@ -5,6 +5,7 @@ from reportlab.pdfgen import canvas # type: ignore
 import tempfile
 import os
 from pydub import AudioSegment
+import io
 
 
 # # Point to bundled ffmpeg binary (if on Streamlit Cloud)
@@ -64,21 +65,45 @@ if transcribe_button and uploaded_file:
             transcript = transcribe_audio(wav_path)
             st.success("Transcription completed!")
 
-            # Save based on selected format
-            if output_format == "DOCX":
-                output_path = "transcription.docx"
-                save_as_doc(transcript, output_path)
-            else:
-                output_path = "transcription.pdf"
-                save_as_pdf(transcript, output_path)
 
-            with open(output_path, "rb") as f:
+            # ... after transcript is ready
+            if output_format == "DOCX":
+                output = io.BytesIO()
+                doc = Document()
+                doc.add_paragraph(transcript)
+                doc.save(output)
+                output.seek(0)
+
                 st.download_button(
-                    label=f"📥 Download {output_format}",
-                    data=f,
-                    file_name=output_path,
-                    mime="application/octet-stream"
+                    label="📥 Download DOCX",
+                    data=output,
+                    file_name="transcription.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                 )
+
+            else:
+                output = io.BytesIO()
+                c = canvas.Canvas(output)
+                c.setFont("Helvetica", 12)
+                x, y = 72, 800
+                for line in transcript.split('\n'):
+                    for chunk in [line[i:i+100] for i in range(0, len(line), 100)]:
+                        c.drawString(x, y, chunk)
+                        y -= 20
+                        if y < 72:
+                            c.showPage()
+                            c.setFont("Helvetica", 12)
+                            y = 800
+                c.save()
+                output.seek(0)
+
+                st.download_button(
+                    label="📥 Download PDF",
+                    data=output,
+                    file_name="transcription.pdf",
+                    mime="application/pdf"
+                )
+
         except Exception as e:
             st.error(f"Error: {e}")
 
