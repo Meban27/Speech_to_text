@@ -156,4 +156,4 @@ if transcribe_button and uploaded_file:
             st.error(f"Error: {e}")
 
     os.remove(temp_audio_path)
->>>>>>> 0d7c313 (changes made)
+
