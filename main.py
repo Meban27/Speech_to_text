@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import streamlit as st # type: ignore
 import whisper # type: ignore
 from docx import Document # type: ignore
